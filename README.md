@@ -144,7 +144,7 @@ The burn schedule is predefined and outlines the percentage of tokens to be burn
 | 73 | BURN FINAL| 777  | 16,250,000     | 100%         | 1.63%                | 3.67%                  | 36             | 57.38%         |
 
 
-### Deployment
+## Deployment
 
 1. This smartcontract is deployed on the the Solana mainnet.
 2. Burn need to be executed manually. A Cron job will be set up but anybody can call the burn function.
