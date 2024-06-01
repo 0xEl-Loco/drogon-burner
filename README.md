@@ -3,11 +3,12 @@
 
 ## Program ID
 mainnet : `EdP2oU3WJZmihpYLzdKVauzS1KUCXDUowCCwHv4retZx`
+
 CLI cmd to check the program : `solana program show EdP2oU3WJZmihpYLzdKVauzS1KUCXDUowCCwHv4retZx`
 
 ## Audit
 This code has been audited by Cyberscope
-on **** 
+4th of June 2024
 Audit report : 
 
 ## Overview
@@ -167,5 +168,4 @@ The combination of PDAs, the absence of withdrawal functionalities, and the immu
 This high-level specification outlines a fixed and immutable burn schedule for managing token burns using a public function, ensuring precise execution according to the predefined intervals and distribution pattern. This approach maintains the security and integrity of the burn process by allowing anyone to trigger the burns while adhering to the defined schedule.
 
 ## Author
-
 Built by El Loco.
