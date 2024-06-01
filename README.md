@@ -153,7 +153,6 @@ The burn schedule is predefined and outlines the percentage of tokens to be burn
 ## Security
 The Drogon Burner Program is designed with a strong focus on security to ensure that the SPL tokens designated for burning cannot be withdrawn or misappropriated. The following security measures are implemented to achieve this:
 
-### Program Derived Addresses (PDA):###
 **Escrow Wallet Authority:** The Escrow Wallet, where the tokens are held before burning, is controlled by a Program Derived Address (PDA). PDAs are special types of addresses that do not have a private key and can only be controlled by the program itself. This ensures that no external entity can sign transactions to transfer tokens out of the escrow wallet manually.
 Controlled Access: Only the Drogon Burner Program has the authority to sign and execute transactions for the PDA. This ensures that all token burns are executed programmatically according to the predefined schedule, without any possibility of unauthorized withdrawals.
 
