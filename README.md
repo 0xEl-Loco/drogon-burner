@@ -7,8 +7,8 @@ mainnet : `EdP2oU3WJZmihpYLzdKVauzS1KUCXDUowCCwHv4retZx`
 CLI cmd to check the program : `solana program show EdP2oU3WJZmihpYLzdKVauzS1KUCXDUowCCwHv4retZx`
 
 ## Audit
-This code has been audited by Cyberscope
-4th of June 2024
+This code has been audited by Cyberscope the 4th of June 2024
+
 Audit report : 
 
 ## Overview
