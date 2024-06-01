@@ -1,8 +1,14 @@
 
-# Drogon Burner Program
+# Drogon Burner
+
+## Program ID
+mainnet : `EdP2oU3WJZmihpYLzdKVauzS1KUCXDUowCCwHv4retZx`
+CLI cmd to check the program : `solana program show EdP2oU3WJZmihpYLzdKVauzS1KUCXDUowCCwHv4retZx`
 
 ## Audit
-This smart contract has been audited **** by **** 
+This code has been audited by Cyberscope
+on **** 
+Audit report : 
 
 ## Overview
 
@@ -13,7 +19,7 @@ The Drogon Burner Program is a Solana-based smart contract designed to manage an
 The objective of this program is to provide a secure setup for token burning operations, including:
 
 1. Initializing a `DrogonAccount` .
-2. Creating an associated token account (EscrowAccount) with the authority set to the `DrogonAccount`.
+2. Creating an associated token account `DrogonAccount` with the authority set to the `DrogonAccount`.
 3. Transferring a specified amount of tokens from El Loco's wallet to the `EscrowAccount`.
 4. Creating an account for the burn schedule
 4. Implementing a function that manage the burn based on the burn schedule.
@@ -142,8 +148,22 @@ The burn schedule is predefined and outlines the percentage of tokens to be burn
 1. This smartcontract is deployed on the the Solana mainnet.
 2. Burn need to be executed manually. A Cron job will be set up but anybody can call the burn function.
 
-## Summary
 
+## Security
+The Drogon Burner Program is designed with a strong focus on security to ensure that the SPL tokens designated for burning cannot be withdrawn or misappropriated. The following security measures are implemented to achieve this:
+
+### Program Derived Addresses (PDA):###
+**Escrow Wallet Authority:** The Escrow Wallet, where the tokens are held before burning, is controlled by a Program Derived Address (PDA). PDAs are special types of addresses that do not have a private key and can only be controlled by the program itself. This ensures that no external entity can sign transactions to transfer tokens out of the escrow wallet manually.
+Controlled Access: Only the Drogon Burner Program has the authority to sign and execute transactions for the PDA. This ensures that all token burns are executed programmatically according to the predefined schedule, without any possibility of unauthorized withdrawals.
+
+**No Manual Withdrawal Functionality:** The program does not include any instructions or functions that would allow for the manual withdrawal of tokens from the Escrow Wallet. This design choice ensures that once tokens are transferred to the escrow, they are locked in place and can only be burned according to the burn schedule.
+
+**Immutable Logic:** Once the program is deployed and the update authority is revoked, the logic of the program becomes immutable. This means no further changes can be made to the contract, ensuring the security mechanisms remain intact and unalterable.
+
+**Ensuring Token Integrity:**
+The combination of PDAs, the absence of withdrawal functionalities, and the immutable program logic ensures that the SPL tokens committed to the Drogon Burner Program are secure. The design guarantees that tokens can only be burned according to the predefined schedule, maintaining the integrity and trustworthiness of the token burn process.
+
+## Conclusion
 This high-level specification outlines a fixed and immutable burn schedule for managing token burns using a public function, ensuring precise execution according to the predefined intervals and distribution pattern. This approach maintains the security and integrity of the burn process by allowing anyone to trigger the burns while adhering to the defined schedule.
 
 ## Author

@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Burn, Mint, Token, TokenAccount, Transfer};
 use std::str::FromStr;
 
-declare_id!("61jAmrHDBA7o1FUambLEtJMXDLLhCFujCYxufKm4Ptij");
+declare_id!("EdP2oU3WJZmihpYLzdKVauzS1KUCXDUowCCwHv4retZx");
 const AUTHORIZED_KEY: &str = "8ZRWFZscsk4S2ZRaaxif8v2zceTiQhVKsTbK8acEXWMu"; // El loco dev wallet. Update Authority will be set to null after initialization.
 
 #[program]
