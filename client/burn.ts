@@ -5,7 +5,7 @@ import { PublicKey } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import BN from 'bn.js';
 
-async function burn() {
+export async function burn() {
     // Configure the client to use the local cluster.
     anchor.setProvider(anchor.AnchorProvider.env());
     const provider = anchor.AnchorProvider.env();
@@ -19,7 +19,7 @@ async function burn() {
 
     const maxRetries = 5;
     const delay = 2000; // 2 seconds
-    let tx;
+    let tx: string | null = null;
 
     for (let i = 0; i < maxRetries; i++) {
         try {
@@ -52,8 +52,12 @@ async function burn() {
         }
     }
 
+    if (!tx) {
+        throw new Error('Failed to submit transaction.');
+    }
+
     // Fetch the transaction details to get the token balance changes
-    let txDetails = null;
+    let txDetails: anchor.web3.ParsedTransactionWithMeta | null = null;
     for (let i = 0; i < maxRetries; i++) {
         txDetails = await provider.connection.getParsedTransaction(tx, "confirmed");
         if (txDetails !== null) break;
@@ -65,23 +69,27 @@ async function burn() {
         throw new Error('Failed to fetch transaction details after several retries.');
     }
 
-    const preTokenBalances = txDetails.meta.preTokenBalances;
-    const postTokenBalances = txDetails.meta.postTokenBalances;
+    const preTokenBalances = txDetails.meta?.preTokenBalances || [];
+    const postTokenBalances = txDetails.meta?.postTokenBalances || [];
 
-    let preBalance = new BN(0);
-    let postBalance = new BN(0);
+    let preBalance = 0;
+    let postBalance = 0;
 
     preTokenBalances.forEach(balance => {
-        preBalance = new BN(balance.uiTokenAmount.amount);
-        console.log(`Balance - pre Tx : ${balance.uiTokenAmount.uiAmountString}`);
+        if (balance.uiTokenAmount.uiAmount !== null) {
+            preBalance += balance.uiTokenAmount.uiAmount;
+            console.log(`Balance - pre Tx : ${balance.uiTokenAmount.uiAmountString}`);
+        }
     });
 
     postTokenBalances.forEach(balance => {
-        postBalance = new BN(balance.uiTokenAmount.amount);
-        console.log(`Balance - post Tx : ${balance.uiTokenAmount.uiAmountString}`);
+        if (balance.uiTokenAmount.uiAmount !== null) {
+            postBalance += balance.uiTokenAmount.uiAmount;
+            console.log(`Balance - post Tx : ${balance.uiTokenAmount.uiAmountString}`);
+        }
     });
 
-    const burn = preBalance.sub(postBalance);
+    const burn = preBalance - postBalance;
     console.log(`Burned with Tx: ${burn.toString()}`);
 }
 
