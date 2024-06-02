@@ -2,9 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { DrogonBurn } from "../target/types/drogon_burn.js";
 import { PublicKey } from "@solana/web3.js";
-import {
-    TOKEN_PROGRAM_ID
-} from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import BN from 'bn.js';
 
 async function burn() {
@@ -19,35 +17,72 @@ async function burn() {
         program.programId
     );
 
-    try {
-        // Fetch the current drogon account details to get the token mint address
-        const drogonAccount = await program.account.drogonAccount.fetch(drogonAccountPda);
-        const initialTotalBurned = new BN(drogonAccount.totalBurned);
+    const maxRetries = 5;
+    const delay = 2000; // 2 seconds
+    let tx;
 
-        // Trigger the burn transaction
-        const tx = await program.methods.burnTokens()
-            .accounts({
-                drogonAccount: drogonAccountPda,
-                burnScheduleAccount: drogonAccount.burnScheduleAccount,
-                sender: provider.wallet.publicKey,
-                tokenProgram: TOKEN_PROGRAM_ID,
-                escrowWalletAccount: drogonAccount.escrowWalletAccount,
-                tokenMint: drogonAccount.tokenMint, // Use the token mint from the fetched drogon account
-                clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
-            })
-            .rpc();
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            // Fetch the current drogon account details to get the token mint address
+            const drogonAccount = await program.account.drogonAccount.fetch(drogonAccountPda);
 
-        console.log("Transaction signature:", tx);
+            // Trigger the burn transaction
+            tx = await program.methods.burnTokens()
+                .accounts({
+                    drogonAccount: drogonAccountPda,
+                    burnScheduleAccount: drogonAccount.burnScheduleAccount,
+                    sender: provider.wallet.publicKey,
+                    tokenProgram: TOKEN_PROGRAM_ID,
+                    escrowWalletAccount: drogonAccount.escrowWalletAccount,
+                    tokenMint: drogonAccount.tokenMint, // Use the token mint from the fetched drogon account
+                    clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
+                })
+                .rpc();
 
-        // Fetch the updated drogon account details to get the total amount burned
-        const updatedDrogonAccount = await program.account.drogonAccount.fetch(drogonAccountPda);
-        const finalTotalBurned = new BN(updatedDrogonAccount.totalBurned);
-        // Calculate the amount burned in this transaction
-        const amountBurned = finalTotalBurned.sub(initialTotalBurned);
-        console.log(`Total Amount Burned: ${amountBurned}`);
-    } catch (error) {
-        console.error('Error burning tokens:', error);
+            console.log("Transaction signature:", tx);
+            break; // Exit the loop if the transaction is successful
+        } catch (error) {
+            console.error(`Attempt ${i + 1} failed:`, error);
+            if (i === maxRetries - 1) {
+                console.error('Max retries reached. Exiting.');
+                throw error;
+            }
+            console.log(`Retrying transaction...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
     }
+
+    // Fetch the transaction details to get the token balance changes
+    let txDetails = null;
+    for (let i = 0; i < maxRetries; i++) {
+        txDetails = await provider.connection.getParsedTransaction(tx, "confirmed");
+        if (txDetails !== null) break;
+        console.log(`Retrying to fetch transaction details (${i + 1}/${maxRetries})...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+    }
+
+    if (!txDetails) {
+        throw new Error('Failed to fetch transaction details after several retries.');
+    }
+
+    const preTokenBalances = txDetails.meta.preTokenBalances;
+    const postTokenBalances = txDetails.meta.postTokenBalances;
+
+    let preBalance = new BN(0);
+    let postBalance = new BN(0);
+
+    preTokenBalances.forEach(balance => {
+        preBalance = new BN(balance.uiTokenAmount.amount);
+        console.log(`Balance - pre Tx : ${balance.uiTokenAmount.uiAmountString}`);
+    });
+
+    postTokenBalances.forEach(balance => {
+        postBalance = new BN(balance.uiTokenAmount.amount);
+        console.log(`Balance - post Tx : ${balance.uiTokenAmount.uiAmountString}`);
+    });
+
+    const burn = preBalance.sub(postBalance);
+    console.log(`Burned with Tx: ${burn.toString()}`);
 }
 
 // Call the function (for example, in your main script)
