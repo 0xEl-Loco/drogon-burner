@@ -10,7 +10,6 @@ mod drogon_burn {
     use super::*;
 
     pub fn initialize_drogon_account(ctx: Context<InitializeDrogonAccount>) -> Result<()> {
-        msg!("Initializing drogon burn program");
         require!(
             ctx.accounts.sender.key() == Pubkey::from_str(AUTHORIZED_KEY).unwrap(),
             ErrorCode::Unauthorized
@@ -32,7 +31,6 @@ mod drogon_burn {
         
         // Mark as initialized
         ctx.accounts.drogon_account.drogon_initialized = true;
-        msg!("Drogon account initialization complete");
         Ok(())
     }
 
@@ -68,7 +66,6 @@ mod drogon_burn {
             transfer_instruction,
         );
         
-        msg!("Attempting to transfer {} tokens", amount);
         let transfer_result = anchor_spl::token::transfer(cpi_ctx, amount);
         if transfer_result.is_err() {
             return Err(ErrorCode::TransferFailed.into());
@@ -77,7 +74,6 @@ mod drogon_burn {
         // Mark as tokens transferred
         ctx.accounts.drogon_account.tokens_transfered_to_escrow = true;
     
-        msg!("Transfer to escrow complete");
         Ok(())
     }
 
@@ -128,9 +124,6 @@ mod drogon_burn {
         if cumulative_burn > drogon_account.total_burned {
             let amount_to_burn = cumulative_burn - drogon_account.total_burned;
             let event_number = relevant_event.event_number;
-
-            msg!("amount to burn: {}!", amount_to_burn);
-            msg!("event_number: {}!", event_number);
             let burn_instruction = Burn {
                 mint: ctx.accounts.token_mint.to_account_info(),
                 from: ctx.accounts.escrow_wallet_account.to_account_info(),
