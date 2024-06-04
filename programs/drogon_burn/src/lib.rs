@@ -2,18 +2,20 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Burn, Mint, Token, TokenAccount, Transfer};
 use std::str::FromStr;
 
-declare_id!("8NYD3MsRsQFTGuQyCBa1BceBssNmUT9DafGze1D3zgLj");
+declare_id!("6bvK7zruhc9YtUSPCtsKLH7XaxUWM2SFfbdXK7yKaVQ8");
 const AUTHORIZED_KEY: &str = "8ZRWFZscsk4S2ZRaaxif8v2zceTiQhVKsTbK8acEXWMu"; // El loco dev wallet. Update Authority will be set to null after initialization.
+const SECONDS_IN_A_DAY: f64 = 86400.0;
+const BURN_EVENT_OFFSET: i64 = 3600; // Burn calendar will start 1h after initiation
+const INITIAL_TRANSFER_AMOUNT: u64 = 573750000;
 
 #[program]
 mod drogon_burn {
     use super::*;
 
     pub fn initialize_drogon_account(ctx: Context<InitializeDrogonAccount>) -> Result<()> {
-        require!(
-            ctx.accounts.sender.key() == Pubkey::from_str(AUTHORIZED_KEY).unwrap(),
-            ErrorCode::Unauthorized
-        );
+        // Authorization Check
+        let authorized_key = Pubkey::from_str(AUTHORIZED_KEY).map_err(|_| ErrorCode::Unauthorized)?;
+        require!(ctx.accounts.sender.key() == authorized_key, ErrorCode::Unauthorized);
 
         // Check if drogon account is already initialized
         require!(
@@ -35,22 +37,21 @@ mod drogon_burn {
     }
 
     pub fn initialize_transfer_to_escrow(ctx: Context<InitializeTransferToEscrow>) -> Result<()> {
-        require!(
-            ctx.accounts.sender.key() == Pubkey::from_str(AUTHORIZED_KEY).unwrap(),
-            ErrorCode::Unauthorized
-        );
-    
+        // Authorization Check
+        let authorized_key = Pubkey::from_str(AUTHORIZED_KEY).map_err(|_| ErrorCode::Unauthorized)?;
+        require!(ctx.accounts.sender.key() == authorized_key, ErrorCode::Unauthorized);
+
         // Check if tokens have already been transferred to escrow
         require!(
             !ctx.accounts.drogon_account.tokens_transfered_to_escrow,
             ErrorCode::TokensAlreadyTransferred
         );
 
-        // Transfer Tokens
-        let transfer_total_amount: u64 = 573750000;
+         // Calculate the amount to transfer
         let token_decimal = ctx.accounts.token_mint.decimals;
-        let amount = transfer_total_amount * 10_u64.pow(token_decimal as u32);
+        let amount = INITIAL_TRANSFER_AMOUNT * 10_u64.pow(token_decimal as u32);
 
+         // Check if the withdraw wallet have enough tokens to execute the transfer
         require!(
             &ctx.accounts.wallet_to_withdraw_from.amount >= &amount, 
             ErrorCode::InsufficientBalance
@@ -78,11 +79,9 @@ mod drogon_burn {
     }
 
     pub fn initialize_burn_schedule(ctx: Context<InitializeBurnSchedule>) -> Result<()> {
-        // Step 1: Authorization Check
-        require!(
-            ctx.accounts.sender.key() == Pubkey::from_str(AUTHORIZED_KEY).unwrap(),
-            ErrorCode::Unauthorized
-        );
+        // Authorization Check
+        let authorized_key = Pubkey::from_str(AUTHORIZED_KEY).map_err(|_| ErrorCode::Unauthorized)?;
+        require!(ctx.accounts.sender.key() == authorized_key, ErrorCode::Unauthorized);
 
         // Check if burn schedule is already initialized
         require!(
@@ -235,7 +234,7 @@ fn map_burn_events(
         .map(
             |(event_number, day, tokens_to_burn, cumulated_burn, burn_stage)| BurnEventData {
                 event_number,
-                timestamp: initiation_time + (day * 86400.0) as i64 + 3600, // burn calendar will start 1h after initiation
+                timestamp: initiation_time + (day * SECONDS_IN_A_DAY) as i64 + BURN_EVENT_OFFSET, // burn calendar will start 1h after initiation
                 burn_stage,
                 cumulative_burned: cumulated_burn,
                 burned_at_event: tokens_to_burn,
