@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Burn, Mint, Token, TokenAccount, Transfer};
 use std::str::FromStr;
 
-declare_id!("EdP2oU3WJZmihpYLzdKVauzS1KUCXDUowCCwHv4retZx");
+declare_id!("8NYD3MsRsQFTGuQyCBa1BceBssNmUT9DafGze1D3zgLj");
 const AUTHORIZED_KEY: &str = "8ZRWFZscsk4S2ZRaaxif8v2zceTiQhVKsTbK8acEXWMu"; // El loco dev wallet. Update Authority will be set to null after initialization.
 
 #[program]
@@ -47,9 +47,9 @@ mod drogon_burn {
         );
 
         // Transfer Tokens
-        let token_decimal: u64 = 1_000_000;
         let transfer_total_amount: u64 = 573750000;
-        let amount = transfer_total_amount * token_decimal;
+        let token_decimal = ctx.accounts.token_mint.decimals;
+        let amount = transfer_total_amount * 10_u64.pow(token_decimal as u32);
 
         require!(
             &ctx.accounts.wallet_to_withdraw_from.amount >= &amount, 
@@ -123,7 +123,6 @@ mod drogon_burn {
         let cumulative_burn = relevant_event.cumulative_burned;
         if cumulative_burn > drogon_account.total_burned {
             let amount_to_burn = cumulative_burn - drogon_account.total_burned;
-            let event_number = relevant_event.event_number;
             let burn_instruction = Burn {
                 mint: ctx.accounts.token_mint.to_account_info(),
                 from: ctx.accounts.escrow_wallet_account.to_account_info(),
@@ -143,7 +142,7 @@ mod drogon_burn {
             let amount = amount_to_burn * 10_u64.pow(token_decimal as u32);
             token::burn(cpi_ctx, amount)?;
 
-            drogon_account.total_burned = drogon_account.total_burned + amount_to_burn;
+            drogon_account.total_burned += amount_to_burn;
         }
         Ok(())
     }
@@ -379,12 +378,8 @@ pub enum ErrorCode {
     BurnScheduleAlreadyInitialized,
     #[msg("Can't perform burn. Initialization is not completed.")]
     IncompleteInitializationForBurn,
-    #[msg("The system clock is unavailable.")]
-    ClockUnavailable,
     #[msg("The init transfer failed.")]
     TransferFailed,
     #[msg("The burn has not started. No relevant event found.")]
     NoRelevantEvent,
-    #[msg("Bump seed not found.")]
-    MissingBump,
 }
