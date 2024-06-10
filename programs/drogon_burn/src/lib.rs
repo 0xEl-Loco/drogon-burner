@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Burn, Mint, Token, TokenAccount, Transfer};
 use std::str::FromStr;
 
-declare_id!("6bvK7zruhc9YtUSPCtsKLH7XaxUWM2SFfbdXK7yKaVQ8");
+declare_id!("7y5MbLiNUR6gRbTBbfzr2G3Rh9HsK641VXun8uk725SV");
 const AUTHORIZED_KEY: &str = "8ZRWFZscsk4S2ZRaaxif8v2zceTiQhVKsTbK8acEXWMu"; // El loco dev wallet. Update Authority will be set to null after initialization.
 const SECONDS_IN_A_DAY: f64 = 86400.0;
 const BURN_EVENT_OFFSET: i64 = 3600; // Burn calendar will start 1h after initiation

@@ -2,9 +2,9 @@
 # Drogon Burner
 
 ## Program ID
-mainnet : `6bvK7zruhc9YtUSPCtsKLH7XaxUWM2SFfbdXK7yKaVQ8`
+mainnet : `7y5MbLiNUR6gRbTBbfzr2G3Rh9HsK641VXun8uk725SV`
 
-CLI cmd to check the program : `solana program show 6bvK7zruhc9YtUSPCtsKLH7XaxUWM2SFfbdXK7yKaVQ8`
+CLI cmd to check the program : `solana program show 7y5MbLiNUR6gRbTBbfzr2G3Rh9HsK641VXun8uk725SV`
 
 ## Audit
 This code has been audited by Cyberscope the 4th of June 2024

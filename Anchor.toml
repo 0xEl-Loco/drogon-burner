@@ -5,14 +5,14 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-drogon_burn = "6bvK7zruhc9YtUSPCtsKLH7XaxUWM2SFfbdXK7yKaVQ8"
+drogon_burn = "7y5MbLiNUR6gRbTBbfzr2G3Rh9HsK641VXun8uk725SV"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "https://api.devnet.solana.com"
-wallet = "~/.config/solana/id.json"
+cluster = "https://neat-holy-frost.solana-mainnet.quiknode.pro/65a548a250489db933f10ca99adee34e575f8716/"
+wallet = "/Users/adrienfernandezbaca/Key/key.json"
 
 
 [scripts]
