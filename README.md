@@ -7,9 +7,9 @@ mainnet : `7y5MbLiNUR6gRbTBbfzr2G3Rh9HsK641VXun8uk725SV`
 CLI cmd to check the program : `solana program show 7y5MbLiNUR6gRbTBbfzr2G3Rh9HsK641VXun8uk725SV`
 
 ## Audit
-This code has been audited by Cyberscope the 4th of June 2024
+This code has been audited by Cyberscope the 13th of June 2024
 
-Audit report : 
+Audit report : https://www.cyberscope.io/audits/drgn
 
 ## Overview
 

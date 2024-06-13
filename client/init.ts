@@ -14,7 +14,7 @@ async function main() {
     const provider = anchor.AnchorProvider.env();
     const program = anchor.workspace.DrogonBurn as Program<DrogonBurn>;
     const decimals = 6;
-    const tokenMint = new PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr");
+    const tokenMint = new PublicKey("token-address");
     const mintDecimals = Math.pow(10, decimals);
 
     const [drogonAccount] = PublicKey.findProgramAddressSync(
